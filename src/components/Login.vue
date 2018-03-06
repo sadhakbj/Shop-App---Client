@@ -27,8 +27,6 @@
 </template>
 
 <script>
-// import axios from "axios";
-
 import auth from "../auth/index";
 
 const baseUrl = "http://localhost:8081/users/login";

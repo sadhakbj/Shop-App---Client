@@ -22,7 +22,7 @@ export default {
                 context.variant = "success";
                 context.message = response.data.message;
                 localStorage.setItem("access_token", userToken);
-                this.user.authenticated = true;
+                this.checkAuth();
                 context.$router.go(redirect);
             })
             .catch(error => {
@@ -58,11 +58,8 @@ export default {
     },
     checkAuth() {
         let token = localStorage.getItem("access_token");
-        if (token) {
-            this.user.authenticated = true;
-        } else {
-            this.user.authenticated = false;
-        }
+
+        return token ? true : false;
     },
     getAuthHeader() {
         return {

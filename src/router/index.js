@@ -12,7 +12,7 @@ Vue.use(Router);
 let router = new Router({
     routes: [{
             path: "/",
-            name: "HelloWorld",
+            name: "hello",
             component: HelloWorld
         },
         {
@@ -26,25 +26,46 @@ let router = new Router({
         {
             path: "/login",
             name: "login",
-            component: Login
+            component: Login,
+            meta: {
+                redirectIfLogged: true
+            }
         },
         {
             path: "/admin",
             name: "admin",
-            component: Login,
+            component: Admin,
             meta: {
                 requiresAuth: true
             }
         }
     ],
+    mode: 'history'
 })
 
+/**
+ * Check for each router if it is logged in or not.
+ */
 router.beforeEach((to, from, next) => {
-    let userLoggedIn = auth.user.authenticated
-    let requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-    if (requiresAuth && !userLoggedIn) next('login')
-    else if (!requiresAuth && userLoggedIn) next('admin')
-    else next()
-});
-
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        if (!auth.checkAuth()) {
+            next({
+                path: '/login',
+                query: { redirect: to.fullPath }
+            })
+        } else {
+            next()
+        }
+    } else if (to.matched.some(record => record.meta.redirectIfLogged)) {
+        if (auth.checkAuth()) {
+            next({
+                path: '/'
+            })
+        } else {
+            next()
+        }
+    } else {
+        next()
+    }
+})
 export default router
